@@ -15,6 +15,12 @@ import javax.swing.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+/**
+ * This class handles all programming logic for constructing and framing the Word Occurrences GUI as well as retrieving the website data and parsing it for entries.
+ * <p> This relies heavily on the free JSoup library to efficiently handle parsing HTML documents. </p>
+ * @author Jordan Roig
+ * @since 15.02+7
+ */
 public class GUI extends JFrame implements ActionListener{
 //these UI elements are created as fields to allow for usage from anywhere within the class.
 	private JButton commitButton = new JButton();
@@ -22,11 +28,21 @@ public class GUI extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 
 //constructor uses superclass elements and then calls creation of GUI
+	/**
+	 * This constructor first calls superclass JFrame elements to construct the actual JFrame, and then class the public create() method to customize it.
+	 */
 	public GUI() {
 		super();
 		create();
 	}
+	
 	//sets style elements and prepares labels
+	
+	/**
+	 * Upon construction, this method is called. It sets default closing behavior, window naming, layout, element sizes, and adds in elements.
+	 * <p>Critically, this method also adds in an actionListener for the button to ensure the program works. Elements are then packed in and setup for their inactive state for the listener to change.</p>
+	 * <p>The important elements whose properties are changed later are stored as private fields to ensure they can be accessed within the class outside of this method.</p>
+	 */
 	public void create() {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("Raven Frequency Search");
@@ -52,6 +68,12 @@ public class GUI extends JFrame implements ActionListener{
 	}
 	
 	
+	/**
+	 *This method overrides the actionPerformed abstract method to set behavior for execution.
+	 *<p>In this case, the listener will change the button text to indicate execution has begun, and then call the analyzer() method to retrieve sorted results.
+	 *It will then construct an output list of text and append it into the JTextArea from the create() method for viewing.</p>
+	 *<p>This method requires a try/catch block due to the need to handle the exceptions thrown by analyzer().</p>
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		//upon button click, sets the button as the source object and changes its text to change upon action completion
@@ -75,6 +97,14 @@ public class GUI extends JFrame implements ActionListener{
 		
 	}
 	
+	/**
+	 * This method constructs a TreeMap object that handles sorting and equivalence for words in a poem. 
+	 * It first establishes a connection to the site hosting the poem, then retrieves the HTML to get text. It then parses it for the words of the poem and uses a BiFunction to match words to frequency.
+	 * <p>The method will then call the entriesSortedByValues() method to sort the values and then return the new list for display.</p>
+	 * <p>This method uses the JSoup library to handle parsing of an HTML document retrieved from a website.</p>
+	 * @return Returns a SortedSet object that contains every unique word in the poem matched to its frequency.
+	 * @throws Exception Handles the possible IOException or connection failure that may occur when attempting to retrieve data from a website.
+	 */
 	public static SortedSet<Entry<String, Integer>> analyzer () throws Exception {
 		//initialize maps and variables
 		int frq = 0;
@@ -120,6 +150,15 @@ public class GUI extends JFrame implements ActionListener{
 	}
 
 	//helper method to create a custom comparator that respects both keys and values in the set
+	/**
+	 *This method allows for the sorting of TreeMaps by their values rather than their keys, something that normally must be done by manually pulling out every value from the map and then sorting.
+	 *This method is critical for the GUI class because the words that are found must be the keys to the map. Keys cannot be repeated, but values can. As such, words will only appear once if set as a value.
+	 *<p>By using the comparator within this method and changing the object type to SortedSet, the map now can be read in order of frequencies rather than by alphabetical order for the key word values.</p>
+	 * @param <K> A generic variable for TreeMap objects that handles unknown data types for the key.
+	 * @param <V> A generic variable for TreeMap objects that handles unknown data types for the value.
+	 * @param map A generic map object that is passed for sorting by its values.
+	 * @return Returns a sorted TreeMap object as a SortedSet object, where the SortedSet is now sorted by values rather than keys.
+	 */
 	static <K,V extends Comparable<? super V>> SortedSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
         SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<Map.Entry<K,V>>(
             new Comparator<Map.Entry<K,V>>() {
